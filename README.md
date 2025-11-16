@@ -1,5 +1,4 @@
 # Eco-Coach AI
-#### Video Demo: https://www.youtube.com/watch?v=3HC5R97T6cQ
 #### Description:
 
 Eco-Coach AI is an AI-powered web application designed to help users minimize household waste and track their environmental impact in a simple and actionable way. The project combines AI technology with an intuitive web interface to provide personalized guidance for disposing of waste and promoting sustainable habits.
