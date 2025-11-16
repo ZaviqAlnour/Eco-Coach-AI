@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+
+{% block title %}Log Waste - Eco-Coach AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Same styles as before for modal, buttons, cards etc. */
+    .ai-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.3s ease;
+    }
+
+    .ai-modal.active {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .ai-modal-content {
+        background-color: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 700px;
+        max-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.3s ease;
+    }
+
+    .ai-modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .ai-modal-header h5 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .ai-close-btn {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s;
+    }
+
+    .ai-close-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    .ai-modal-body {
+        padding: 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+        text-align: center;
+    }
+
+    .ai-buttons-container {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+    }
+
+    .ai-action-btn {
+        flex: 1;
+        min-width: 150px;
+        padding: 0.75rem 1rem;
+        border: 2px solid #10b981;
+        background: white;
+        color: #10b981;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .ai-action-btn:hover {
+        background: #10b981;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .ai-modal-content {
+            width: 95%;
+            max-height: 90vh;
+        }
+
+        .ai-buttons-container {
+            flex-direction: column;
+        }
+
+        .ai-action-btn {
+            min-width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h1>Log a Waste Item 🗑️</h1>
+                <p class="text-muted">
+                    Enter the item you're throwing away and explore resources online
+                </p>
+            </div>
+
+            <!-- Main Form Card -->
+            <div class="card shadow-sm">
+                <div class="card-body p-4 p-md-5">
+                    <form method="POST" action="{{ url_for('log_waste') }}" id="wasteForm">
+                        <div class="mb-4">
+                            <label for="item_name" class="form-label fw-bold">
+                                What are you throwing away? *
+                            </label>
+                            <input type="text"
+                                   class="form-control form-control-lg"
+                                   id="item_name"
+                                   name="item_name"
+                                   required
+                                   placeholder="e.g., plastic bottle, banana peel, old batteries..."
+                                   autofocus>
+                            <div class="form-text">
+                                Be as specific as possible for better search results
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="quantity" class="form-label fw-bold">
+                                Quantity (optional)
+                            </label>
+                            <input type="number"
+                                   class="form-control form-control-lg"
+                                   id="quantity"
+                                   name="quantity"
+                                   value="1.0"
+                                   step="0.1"
+                                   min="0.1"
+                                   max="1000">
+                        </div>
+
+                        <!-- AI/Google Action Buttons -->
+                        <div class="ai-buttons-container mb-4">
+                            <button type="button" class="ai-action-btn" onclick="openSearchModal('disposal')">
+                                <span>♻️</span>
+                                <span>Disposal Instructions</span>
+                            </button>
+                            <button type="button" class="ai-action-btn" onclick="openSearchModal('tips')">
+                                <span>💡</span>
+                                <span>Smart Tips</span>
+                            </button>
+                            <button type="button" class="ai-action-btn" onclick="openSearchModal('impact')">
+                                <span>🌍</span>
+                                <span>Impact Tracking</span>
+                            </button>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                                Log Waste
+                            </button>
+                            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info and Examples (same as before) -->
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div id="aiModal" class="ai-modal">
+    <div class="ai-modal-content">
+        <div class="ai-modal-header">
+            <h5 id="modalTitle">Search Online</h5>
+            <button class="ai-close-btn" onclick="closeAIModal()">&times;</button>
+        </div>
+        <div class="ai-modal-body" id="modalBody">
+            Click the button below to open Google search.
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const modalTitles = {
+        disposal: '♻️ Disposal Instructions',
+        tips: '💡 Smart Tips',
+        impact: '🌍 Impact Tracking'
+    };
+
+    function openSearchModal(type) {
+        const itemName = document.getElementById('item_name').value.trim();
+        if (!itemName) {
+            alert("Please enter an item name first!");
+            return;
+        }
+
+        const modal = document.getElementById('aiModal');
+        document.getElementById('modalTitle').textContent = modalTitles[type];
+
+        // Show modal
+        modal.classList.add('active');
+
+        // Set modal body with Google search link
+        let searchQuery = '';
+        if (type === 'disposal') searchQuery = `${itemName} proper disposal recycling compost`;
+        else if (type === 'tips') searchQuery = `${itemName} reduce reuse tips eco-friendly`;
+        else if (type === 'impact') searchQuery = `${itemName} environmental impact CO2 savings`;
+
+        document.getElementById('modalBody').innerHTML = `
+            <p>Click below to search online for <strong>${itemName}</strong>:</p>
+            <a href="https://www.google.com/search?q=${encodeURIComponent(searchQuery)}" target="_blank" class="btn btn-success mt-3">
+                🔍 Search Google
+            </a>
+        `;
+    }
+
+    function closeAIModal() {
+        document.getElementById('aiModal').classList.remove('active');
+    }
+
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('aiModal');
+        if (e.target === modal) closeAIModal();
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeAIModal();
+    });
+</script>
+{% endblock %}

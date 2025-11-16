@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}History - Eco-Coach AI{% endblock %}
+
+{% block content %}
+<div class="container mt-4 mb-5">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>Waste Log History 📋</h1>
+            <p class="text-muted">Complete history of all your logged waste items</p>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row g-3 mb-4">
+        {% set total_co2 = logs|sum(attribute='co2_saved')|round(2) %}
+        <div class="col-md-3">
+            <div class="card bg-light border-0 text-center p-3">
+                <h6 class="text-muted mb-2">Total Items</h6>
+                <h3 class="text-primary mb-0">{{ logs|length }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light border-0 text-center p-3">
+                <h6 class="text-muted mb-2">Total CO₂ Saved</h6>
+                <h3 class="text-success mb-0">{{ total_co2 }} kg</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light border-0 text-center p-3">
+                <h6 class="text-muted mb-2">This Week</h6>
+                <h3 class="text-info mb-0">{{ recent_logs_count }}</h3>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-light border-0 text-center p-3">
+                <h6 class="text-muted mb-2">This Month</h6>
+                <h3 class="text-warning mb-0">{{ monthly_logs_count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter & Search -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="searchInput" placeholder="🔍 Search items...">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="categoryFilter">
+                                <option value="">All Categories</option>
+                                {% for cat in ['food', 'recyclable', 'hazardous', 'compostable', 'other'] %}
+                                    <option value="{{ cat }}">{{ cat|title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ url_for('log_waste') }}" class="btn btn-primary w-100">➕ Log New Item</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    {% if logs %}
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="historyTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Item Name</th>
+                                        <th>Category</th>
+                                        <th>Qty</th>
+                                        <th>CO₂ Saved</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for log in logs %}
+                                    <tr class="log-row" data-item="{{ log.item_name|lower }}" data-category="{{ log.category }}">
+                                        <td>
+                                            <small>{{ log.timestamp.strftime('%m/%d/%Y') }}</small><br>
+                                            <small class="text-muted">{{ log.timestamp.strftime('%I:%M %p') }}</small>
+                                        </td>
+                                        <td><strong>{{ log.item_name }}</strong></td>
+                                        <td><span class="badge-category badge-{{ log.category }}">{{ log.category|title }}</span></td>
+                                        <td>{{ log.quantity }}</td>
+                                        <td><span class="text-success fw-bold">{{ log.co2_saved }} kg</span></td>
+                                        <td>
+                                            <a href="{{ url_for('view_log', log_id=log.id) }}" class="btn btn-sm btn-outline-primary">View</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="noResults" class="text-center py-5 d-none">
+                            <p class="text-muted mb-0">No matching logs found</p>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div style="font-size: 4rem;" class="mb-3">📭</div>
+                            <h4 class="mb-3">No waste logs yet</h4>
+                            <p class="text-muted mb-4">Start tracking your waste to see your environmental impact!</p>
+                            <a href="{{ url_for('log_waste') }}" class="btn btn-primary btn-lg">Log Your First Item</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const logRows = document.querySelectorAll('.log-row');
+const noResults = document.getElementById('noResults');
+const tableBody = document.querySelector('#historyTable tbody');
+
+function filterLogs() {
+    const term = searchInput.value.toLowerCase();
+    const cat = categoryFilter.value;
+    let count = 0;
+    logRows.forEach(row => {
+        const matchItem = row.dataset.item.includes(term);
+        const matchCat = !cat || row.dataset.category === cat;
+        row.style.display = (matchItem && matchCat) ? '' : 'none';
+        if (matchItem && matchCat) count++;
+    });
+    tableBody.style.display = count ? '' : 'none';
+    noResults.classList.toggle('d-none', count > 0);
+}
+
+searchInput.addEventListener('input', filterLogs);
+categoryFilter.addEventListener('change', filterLogs);
+</script>
+{% endblock %}

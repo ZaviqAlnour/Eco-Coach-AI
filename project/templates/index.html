@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">
+                    Reduce Waste with AI-Powered Coaching
+                </h1>
+                <p class="lead mb-4">
+                    Get personalized disposal instructions, environmental impact insights,
+                    and actionable tips to minimize your household waste.
+                </p>
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{{ url_for('register') }}" class="btn btn-light btn-lg px-4">
+                        Get Started Free
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg px-4">
+                        Login
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center mt-4 mt-lg-0">
+                <div style="font-size: 10rem;">♻️</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row g-4">
+        <!-- Feature 1 -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div style="font-size: 3rem;" class="mb-3">🤖</div>
+                    <h5 class="card-title">AI-Powered Guidance</h5>
+                    <p class="card-text">
+                        Our Qwen3 AI model analyzes your waste items and provides
+                        personalized disposal instructions based on recycling best practices.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div style="font-size: 3rem;" class="mb-3">📊</div>
+                    <h5 class="card-title">Track Your Impact</h5>
+                    <p class="card-text">
+                        See your environmental impact with CO2 savings calculations
+                        and visualize your waste reduction journey with charts.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <div style="font-size: 3rem;" class="mb-3">💡</div>
+                    <h5 class="card-title">Smart Tips</h5>
+                    <p class="card-text">
+                        Receive personalized tips for reducing future waste,
+                        food preservation strategies, and sustainable living advice.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <h2 class="text-center mb-4">How It Works</h2>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-3 text-center">
+            <div class="mb-3" style="font-size: 2.5rem;">1️⃣</div>
+            <h5>Log Your Waste</h5>
+            <p class="text-muted">
+                Enter the item you're throwing away
+            </p>
+        </div>
+
+        <div class="col-md-3 text-center">
+            <div class="mb-3" style="font-size: 2.5rem;">2️⃣</div>
+            <h5>Get AI Analysis</h5>
+            <p class="text-muted">
+                Our AI analyzes and categorizes your item
+            </p>
+        </div>
+
+        <div class="col-md-3 text-center">
+            <div class="mb-3" style="font-size: 2.5rem;">3️⃣</div>
+            <h5>Learn & Improve</h5>
+            <p class="text-muted">
+                Receive disposal instructions and tips
+            </p>
+        </div>
+
+        <div class="col-md-3 text-center">
+            <div class="mb-3" style="font-size: 2.5rem;">4️⃣</div>
+            <h5>Track Progress</h5>
+            <p class="text-muted">
+                Monitor your environmental impact
+            </p>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <div class="card bg-light">
+                <div class="card-body py-5">
+                    <h3 class="mb-3">Ready to Make a Difference?</h3>
+                    <p class="lead mb-4">
+                        Join Eco-Coach AI today and start your waste reduction journey
+                    </p>
+                    <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">
+                        Create Free Account
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
